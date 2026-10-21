@@ -1,0 +1,75 @@
+<!-- sentiment_analysis/templates/sentiment_analysis/analyze.html -->
+
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sentiment Analysis{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-info text-white">
+                <h3><i class="fas fa-brain"></i> Sentiment Analysis</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-info mt-3">
+                        <i class="fas fa-chart-line"></i> Analyze Sentiment
+                    </button>
+                    <a href="{% url 'sentiment_analysis:dataset_analysis' %}" class="btn btn-secondary mt-3">
+                        <i class="fas fa-database"></i> Analyze from Dataset
+                    </a>
+                </form>
+                
+                {% if result %}
+                <hr>
+                <div class="alert alert-success mt-4">
+                    <h4><i class="fas fa-check-circle"></i> Analysis Result</h4>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <strong>Predicted Sentiment:</strong>
+                            <span class="badge bg-{% if result.sentiment == 'positive' %}success{% elif result.sentiment == 'negative' %}danger{% else %}secondary{% endif %} fs-5">
+                                {{ result.sentiment|upper }}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Confidence Score:</strong>
+                            <span class="badge bg-primary fs-5">{{ result.confidence|floatformat:2 }}%</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header bg-secondary text-white">
+                <h5><i class="fas fa-history"></i> Recent Analyses</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_analyses %}
+                    <ul class="list-group">
+                        {% for analysis in recent_analyses %}
+                        <li class="list-group-item">
+                            <small class="text-muted">{{ analysis.analysis_timestamp|date:"M d, Y H:i" }}</small><br>
+                            <strong>{{ analysis.input_text|truncatewords:5 }}</strong><br>
+                            <span class="badge bg-{% if analysis.predicted_sentiment == 'positive' %}success{% elif analysis.predicted_sentiment == 'negative' %}danger{% else %}secondary{% endif %}">
+                                {{ analysis.predicted_sentiment }}
+                            </span>
+                            <span class="badge bg-info">{{ analysis.confidence_score|floatformat:1 }}%</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No analyses yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

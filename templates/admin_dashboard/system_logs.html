@@ -1,0 +1,51 @@
+<!-- admin_dashboard/templates/admin_dashboard/system_logs.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}System Logs{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-file-alt"></i> System Logs</h2>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-header bg-dark text-white">
+        <h5><i class="fas fa-list"></i> Recent Logs</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Level</th>
+                        <th>Message</th>
+                        <th>User</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>
+                            <span class="badge bg-{% if log.level == 'ERROR' %}danger{% elif log.level == 'WARNING' %}warning{% else %}info{% endif %}">
+                                {{ log.level }}
+                            </span>
+                        </td>
+                        <td>{{ log.message }}</td>
+                        <td>{{ log.user.username|default:"System" }}</td>
+                        <td><small>{{ log.timestamp|date:"M d, Y H:i:s" }}</small></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No logs available</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

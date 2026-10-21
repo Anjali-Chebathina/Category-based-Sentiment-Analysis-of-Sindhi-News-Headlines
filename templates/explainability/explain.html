@@ -1,0 +1,82 @@
+<!-- explainability/templates/explainability/explain.html -->
+
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Explainability{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-warning text-dark">
+                <h3><i class="fas fa-lightbulb"></i> Explainable AI - LIME Analysis</h3>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-warning mt-3">
+                        <i class="fas fa-search"></i> Generate Explanation
+                    </button>
+                </form>
+                
+                {% if explanation %}
+                <hr>
+                <div class="mt-4">
+                    <h4><i class="fas fa-chart-bar"></i> Prediction Explanation</h4>
+                    
+                    <div class="alert alert-info">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Predicted Sentiment:</strong>
+                                <span class="badge bg-{% if explanation.predicted_class == 'positive' %}success{% elif explanation.predicted_class == 'negative' %}danger{% else %}secondary{% endif %} fs-5">
+                                    {{ explanation.predicted_class|upper }}
+                                </span>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Confidence:</strong>
+                                <span class="badge bg-primary fs-5">{{ explanation.confidence|floatformat:2 }}%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5 class="mt-4">Feature Importance (Words Contributing to Prediction)</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Word/Phrase</th>
+                                    <th>Importance Score</th>
+                                    <th>Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for feature, weight in explanation.feature_weights %}
+                                <tr>
+                                    <td><strong>{{ feature }}</strong></td>
+                                    <td>{{ weight|floatformat:3 }}</td>
+                                    <td>
+                                        {% if weight > 0 %}
+                                        <span class="badge bg-success">Positive Impact</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Negative Impact</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="alert alert-light mt-3">
+                        <strong><i class="fas fa-info-circle"></i> How to Read:</strong>
+                        <p class="mb-0">Words with positive scores support the predicted sentiment, while negative scores work against it. The magnitude shows how strongly each word influences the prediction.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+
+# Secrets and environment settings
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+venv/
+.venv/
+sindhi_venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Django local files
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+
+# Local editor and operating system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

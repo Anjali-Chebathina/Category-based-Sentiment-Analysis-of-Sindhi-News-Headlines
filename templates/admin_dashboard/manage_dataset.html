@@ -1,0 +1,84 @@
+<!-- admin_dashboard/templates/admin_dashboard/manage_dataset.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Manage Dataset{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4"><i class="fas fa-database"></i> Manage Dataset</h2>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-upload"></i> Bulk Upload Headlines (CSV)</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Upload CSV File</label>
+                        <input type="file" name="csv_file" class="form-control" accept=".csv" required>
+                        <small class="text-muted">CSV should have columns: headline, category, sentiment</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload"></i> Upload
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-list"></i> Recent Headlines</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Headline</th>
+                                <th>Category</th>
+                                <th>Sentiment</th>
+                                <th>Added</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for headline in headlines %}
+                            <tr>
+                                <td>{{ headline.id }}</td>
+                                <td>{{ headline.headline|truncatewords:15 }}</td>
+                                <td>
+                                    {% if headline.category %}
+                                    <span class="badge bg-primary">{{ headline.category.name }}</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Uncategorized</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if headline.sentiment %}
+                                    <span class="badge bg-{% if headline.sentiment == 'positive' %}success{% elif headline.sentiment == 'negative' %}danger{% else %}secondary{% endif %}">
+                                        {{ headline.sentiment }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td><small>{{ headline.created_at|date:"M d, Y" }}</small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

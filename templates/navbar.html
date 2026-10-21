@@ -1,0 +1,148 @@
+<!-- templates/navbar.html -->
+
+<nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <i class="fas fa-newspaper"></i>
+            <span>Sindhi News AI</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'sentiment' in request.path %}active{% endif %}" href="{% url 'sentiment_analysis:analyze' %}">
+                            <i class="fas fa-brain"></i> Sentiment
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'classification' in request.path %}active{% endif %}" href="{% url 'news_classification:classify' %}">
+                            <i class="fas fa-tags"></i> Classification
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'explainability' in request.path %}active{% endif %}" href="{% url 'explainability:explain' %}">
+                            <i class="fas fa-lightbulb"></i> XAI
+                        </a>
+                    </li>
+                    {% if user.role == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'admin-dashboard' in request.path %}active{% endif %}" href="{% url 'admin_dashboard:dashboard' %}">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                    {% endif %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="user-avatar me-2">
+                                <i class="fas fa-user-circle fa-lg"></i>
+                            </div>
+                            <span>{{ user.username }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2" aria-labelledby="userDropdown">
+                            <li class="dropdown-header">
+                                <strong>{{ user.get_full_name|default:user.username }}</strong>
+                                <br>
+                                <small class="text-muted">{{ user.email }}</small>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                    <i class="fas fa-user me-2"></i> My Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-history me-2"></i> My History
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-cog me-2"></i> Settings
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:login' %}">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary text-white ms-2 px-3" href="{% url 'accounts:register' %}">
+                            <i class="fas fa-user-plus"></i> Get Started
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<style>
+    /* Dropdown Menu Styling */
+    .dropdown-menu {
+        border-radius: 12px;
+        padding: 0.5rem;
+        min-width: 250px;
+        animation: dropdownFade 0.3s ease;
+    }
+
+    @keyframes dropdownFade {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .dropdown-header {
+        padding: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+    }
+
+    .dropdown-item {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .dropdown-item:hover {
+        background: rgba(102, 126, 234, 0.1);
+        transform: translateX(5px);
+    }
+
+    .dropdown-item i {
+        width: 20px;
+        text-align: center;
+    }
+
+    .user-avatar {
+        color: #667eea;
+    }
+
+    .navbar-toggler:focus {
+        box-shadow: none;
+    }
+</style>

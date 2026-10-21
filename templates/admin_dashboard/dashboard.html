@@ -1,0 +1,651 @@
+<!-- admin_dashboard/templates/admin_dashboard/dashboard.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        animation: slideDown 0.6s ease;
+    }
+
+    .dashboard-header h2 {
+        margin: 0;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .dashboard-header .welcome-text {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-top: 0.5rem;
+    }
+
+    /* Stats Cards */
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        transition: all 0.3s ease;
+        border: none;
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.6s ease;
+        animation-fill-mode: both;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        transition: width 0.3s ease;
+    }
+
+    .stat-card:hover::before {
+        width: 100%;
+        opacity: 0.1;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card-primary::before {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .stat-card-success::before {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .stat-card-info::before {
+        background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    }
+
+    .stat-card-warning::before {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .stat-icon-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+    }
+
+    .stat-icon-info {
+        background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+        color: white;
+    }
+
+    .stat-icon-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #64748b;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Action Cards */
+    .action-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        height: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .action-card:hover {
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .action-card h5 {
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        width: 100%;
+        padding: 1rem;
+        font-weight: 600;
+        border-radius: 10px;
+        border: none;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .action-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+
+    .action-btn:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Data Tables */
+    .data-table-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        margin-bottom: 2rem;
+    }
+
+    .data-table-card h5 {
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        border-radius: 12px;
+        max-height: 400px;
+    }
+
+    .custom-table {
+        margin: 0;
+        background: white;
+    }
+
+    .custom-table thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .custom-table thead th {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .custom-table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .custom-table tbody tr:hover {
+        background: rgba(102, 126, 234, 0.05);
+        transform: scale(1.01);
+    }
+
+    .custom-table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    /* Chart Card */
+    .chart-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        height: 100%;
+    }
+
+    .chart-card h6 {
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: #1e293b;
+    }
+
+    /* Progress Bars */
+    .progress-item {
+        margin-bottom: 1.5rem;
+    }
+
+    .progress-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .progress {
+        height: 12px;
+        border-radius: 10px;
+        background: #f1f5f9;
+        overflow: visible;
+    }
+
+    .progress-bar {
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: visible;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #94a3b8;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    /* Animation Delays */
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .stat-value {
+            font-size: 2rem;
+        }
+
+        .dashboard-header h2 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <h2>
+        <i class="fas fa-tachometer-alt"></i>
+        Admin Dashboard
+    </h2>
+    <p class="welcome-text mb-0">
+        Welcome back, {{ user.username }}! Here's what's happening with your system today.
+    </p>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card stat-card-primary">
+            <div class="stat-icon stat-icon-primary">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">{{ total_users }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card stat-card-success">
+            <div class="stat-icon stat-icon-success">
+                <i class="fas fa-newspaper"></i>
+            </div>
+            <div class="stat-value">{{ total_headlines }}</div>
+            <div class="stat-label">Headlines</div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card stat-card-info">
+            <div class="stat-icon stat-icon-info">
+                <i class="fas fa-tags"></i>
+            </div>
+            <div class="stat-value">{{ total_categories }}</div>
+            <div class="stat-label">Categories</div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card stat-card-warning">
+            <div class="stat-icon stat-icon-warning">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-value">{{ total_analyses }}</div>
+            <div class="stat-label">Analyses</div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Cards Row -->
+<div class="row g-4 mb-4">
+    <!-- Model Training -->
+    <div class="col-lg-6">
+        <div class="action-card">
+            <h5>
+                <i class="fas fa-robot text-primary"></i>
+                Model Training
+            </h5>
+            <form method="post" action="{% url 'admin_dashboard:train_sentiment' %}" class="mb-3">
+                {% csrf_token %}
+                <button type="submit" class="action-btn btn btn-primary">
+                    <i class="fas fa-brain"></i> Train Sentiment Analysis Model
+                </button>
+            </form>
+            
+            <form method="post" action="{% url 'admin_dashboard:train_classification' %}">
+                {% csrf_token %}
+                <button type="submit" class="action-btn btn btn-success">
+                    <i class="fas fa-sitemap"></i> Train Classification Model
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-lg-6">
+        <div class="action-card">
+            <h5>
+                <i class="fas fa-bolt text-warning"></i>
+                Quick Actions
+            </h5>
+            <a href="{% url 'admin_dashboard:manage_users' %}" class="action-btn btn btn-info mb-3">
+                <i class="fas fa-users-cog"></i> Manage Users
+            </a>
+            <a href="{% url 'admin_dashboard:manage_dataset' %}" class="action-btn btn btn-warning mb-3">
+                <i class="fas fa-database"></i> Manage Dataset
+            </a>
+            <a href="{% url 'admin_dashboard:export_results' %}" class="action-btn btn btn-secondary">
+                <i class="fas fa-download"></i> Export Results (CSV)
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Data Tables Row -->
+<div class="row g-4 mb-4">
+    <!-- Recent Analyses -->
+    <div class="col-lg-6">
+        <div class="data-table-card">
+            <h5>
+                <span>
+                    <i class="fas fa-history text-info"></i> Recent Analyses
+                </span>
+                <span class="badge bg-info">{{ recent_analyses.count }}</span>
+            </h5>
+            <div class="table-wrapper">
+                {% if recent_analyses %}
+                <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Sentiment</th>
+                            <th>Category</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for analysis in recent_analyses %}
+                        <tr>
+                            <td>
+                                <i class="fas fa-user-circle text-primary me-1"></i>
+                                <strong>{{ analysis.user.username }}</strong>
+                            </td>
+                            <td>
+                                {% if analysis.predicted_sentiment %}
+                                <span class="badge bg-{% if analysis.predicted_sentiment == 'positive' %}success{% elif analysis.predicted_sentiment == 'negative' %}danger{% else %}secondary{% endif %}">
+                                    {{ analysis.predicted_sentiment|upper }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if analysis.predicted_category %}
+                                <span class="badge bg-primary">{{ analysis.predicted_category }}</span>
+                                {% else %}
+                                <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted">
+                                    <i class="far fa-clock me-1"></i>
+                                    {{ analysis.analysis_timestamp|date:"M d, H:i" }}
+                                </small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <p>No analyses yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Performance -->
+    <div class="col-lg-6">
+        <div class="data-table-card">
+            <h5>
+                <span>
+                    <i class="fas fa-chart-bar text-success"></i> Model Performance
+                </span>
+                <span class="badge bg-success">{{ recent_models.count }}</span>
+            </h5>
+            <div class="table-wrapper">
+                {% if recent_models %}
+                <table class="table custom-table">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Type</th>
+                            <th>Accuracy</th>
+                            <th>F1-Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for model in recent_models %}
+                        <tr>
+                            <td>
+                                <strong>{{ model.model_name|truncatewords:3 }}</strong>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if model.model_type == 'sentiment' %}primary{% else %}success{% endif %}">
+                                    {{ model.get_model_type_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <strong class="text-success">{{ model.accuracy|floatformat:2 }}%</strong>
+                            </td>
+                            <td>
+                                <strong class="text-info">{{ model.f1_score|floatformat:2 }}%</strong>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-robot"></i>
+                    <p>No models trained yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4">
+    <!-- Category Distribution -->
+    <div class="col-lg-6">
+        <div class="chart-card">
+            <h6>
+                <i class="fas fa-chart-pie text-warning"></i>
+                Category Distribution
+            </h6>
+            {% if category_stats %}
+                {% for stat in category_stats %}
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>{{ stat.category__name|default:"Uncategorized" }}</span>
+                        <span class="text-muted">{{ stat.count }}</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" 
+                             style="width: {% widthratio stat.count total_headlines 100 %}%"
+                             role="progressbar">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-chart-pie"></i>
+                <p>No category data available</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Sentiment Distribution -->
+    <div class="col-lg-6">
+        <div class="chart-card">
+            <h6>
+                <i class="fas fa-smile text-danger"></i>
+                Sentiment Distribution
+            </h6>
+            {% if sentiment_stats %}
+                {% for stat in sentiment_stats %}
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>
+                            <i class="fas fa-{% if stat.sentiment == 'positive' %}smile{% elif stat.sentiment == 'negative' %}frown{% else %}meh{% endif %} me-1"></i>
+                            {{ stat.sentiment|default:"Unknown"|title }}
+                        </span>
+                        <span class="text-muted">{{ stat.count }}</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-{% if stat.sentiment == 'positive' %}success{% elif stat.sentiment == 'negative' %}danger{% else %}secondary{% endif %}" 
+                             style="width: {% widthratio stat.count total_headlines 100 %}%"
+                             role="progressbar">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-smile"></i>
+                <p>No sentiment data available</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- System Logs Link -->
+<div class="mt-4 text-center">
+    <a href="{% url 'admin_dashboard:system_logs' %}" class="btn btn-outline-secondary btn-lg">
+        <i class="fas fa-file-alt"></i> View System Logs
+    </a>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Confirm before training
+    document.querySelectorAll('form[action*="train"]').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            if (!confirm('Training may take several minutes. Continue?')) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Auto-refresh stats every 30 seconds (optional)
+    // setInterval(() => {
+    //     location.reload();
+    // }, 30000);
+</script>
+{% endblock %}
