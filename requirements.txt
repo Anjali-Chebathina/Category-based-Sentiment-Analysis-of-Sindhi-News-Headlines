@@ -29,3 +29,8 @@ threadpoolctl==3.6.0
 tifffile==2026.2.20
 tqdm==4.67.3
 tzdata==2025.3
+gunicorn==21.2.0
+whitenoise==6.6.0
+django>=4.0
+mysqlclient>=2.0
+# ... plus all your other packages like pandas, scikit-learn, transformers, etc.
